@@ -14,7 +14,6 @@ class View(ttk.Frame):
         self.gpa_var = tk.DoubleVar()
         self.sort_by_var = tk.StringVar()
         self.find_by_var = tk.StringVar()
-        #, padx=6, pady=6
         # Create labels and entry widgets
         self.id_label = ttk.Label(self, text="MSSV:").grid(row=2, column=0, padx=6, pady=6)
         self.id_entry = ttk.Entry(self, textvariable=self.student_id_var).grid(row=2, column=1, padx=6, pady=6)
@@ -37,18 +36,12 @@ class View(ttk.Frame):
         self.sort_by_choices = ttk.Combobox(self, textvariable=self.sort_by_var, values=["Gpa", "Họ", "Tên"]).grid(row=4, column=4, padx=6, pady=6)
         self.find_by_choices = ttk.Combobox(self, textvariable=self.find_by_var, values=["Major", "MSSV"]).grid(row=4, column=5, padx=6, pady=6)
 
-        # self.show_button = ttk.Button(self, text="DSSV", command=self.).grid(row=3, column=0)
+        self.show_button = ttk.Button(self, text="DSSV", command=lambda: self.display_students(show_button=True)).grid(row=3, column=0, padx=6, pady=6)
         self.add_button = ttk.Button(self, text="Thêm Sinh viên", command=self.add_student).grid(row=3, column=1, padx=6, pady=6)
         self.update_button = ttk.Button(self, text="Cập nhật Sinh viên", command=self.update_student).grid(row=3, column=2, padx=6, pady=6)
         self.delete_button = ttk.Button(self, text="Xoá Sinh viên", command=self.delete_student).grid(row=3, column=3, padx=6, pady=6)
         self.sort_button = ttk.Button(self, text="Sắp xếp", command=self.sort_students).grid(row=3, column=4, padx=6, pady=6)
         self.find_button = ttk.Button(self, text="Tìm Sinh viên", command=self.find_student).grid(row=3, column=5, padx=6, pady=6)
-
-        #  # Configure grid for responsiveness
-        # for i in range(6):  # Adjust depending on your grid size
-        #     self.columnconfigure(i, weight=1)
-        # for i in range(5):  # Adjust depending on your grid size
-        #     self.rowconfigure(i, weight=1)
 
         # Create student table
         self.student_tree = ttk.Treeview(self, columns=("MSSV", "Họ", "Tên đệm", "Tên", "Môn học", "GPA"), show="headings")
@@ -59,8 +52,10 @@ class View(ttk.Frame):
         self.student_tree.heading("Môn học", text="Môn học")
         self.student_tree.heading("GPA", text="GPA")
         self.student_tree.grid(row=5, column=0, columnspan=6, padx=6, pady=6)
-    
-    def display_students(self, students_list=None):
+
+    def display_students(self, students_list=None, show_button=False):
+        if self.controller and show_button == True:
+            students_list = self.controller.get_all_students()
         self.student_tree.delete(*self.student_tree.get_children())
         if type(students_list) == dict:
             self.student_tree.insert("", "end", values=tuple(students_list.values()))
@@ -88,7 +83,7 @@ class View(ttk.Frame):
         student_id, first_name, middle_name, last_name, major, gpa = self.get_value()
         if self.controller:
             self.controller.insert_student(student_id, last_name, middle_name, first_name, major, gpa)
-        # Clear entry widgets
+            self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
     
     def update_student(self):
@@ -96,14 +91,14 @@ class View(ttk.Frame):
 
         if self.controller:
             self.controller.update_student(student_id, last_name, middle_name, first_name, major, gpa)
-        # Clear entry widgets
+            self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
     
     def delete_student(self):
         student_id, _, _, _, _, _ = self.get_value()
         if self.controller:
             self.controller.delete_student(student_id)
-        # Clear entry widgets
+            self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
     
     def find_student(self):
@@ -115,14 +110,14 @@ class View(ttk.Frame):
             else:
                 student_id, _, _, _, _, _ = self.get_value()
                 self.controller.find_student(find_by, student_id)
-        # Clear entry widgets
+        self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
 
     def sort_students(self):
         sort_by = self.sort_by_var.get()
         if self.controller:
             self.controller.sort_students(sort_by)
-
+            self.display_students(students_list=self.controller.students_to_show)
 
     def set_controller(self, controller):
         self.controller = controller
