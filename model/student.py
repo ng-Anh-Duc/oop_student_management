@@ -28,3 +28,21 @@ class Student():
         elif sort_by == 'Tên':
             sorted_students = sorted(students, key=lambda student: student['firstName'])
         return sorted_students
+    
+    def find_student(self, find_by, value):
+        students = self.read_students()
+        if find_by == 'Major':
+            for s in students:
+                if s['major'] == value:
+                    found_student = s
+                    break
+            else:
+                found_student = None
+        elif find_by == 'MSSV':
+            for s in students:
+                if s['id'] == value:
+                    found_student = s
+                    break
+            else:
+                found_student = None
+        return found_student

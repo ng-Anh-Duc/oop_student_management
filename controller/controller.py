@@ -41,3 +41,10 @@ class Controller():
     def sort_students(self, sort_by):
         sorted_students = self.model.sort_students(sort_by)
         self.view.display_students(students_list=sorted_students)
+    
+    def find_student(self, find_by, value):
+        found_student = self.model.find_student(find_by, value)
+        if found_student == None:
+            self.view.display_student_not_yet_stored_error()
+        else:
+            self.view.display_students(students_list=found_student)

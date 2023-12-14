@@ -13,6 +13,7 @@ class View(ttk.Frame):
         self.major_var = tk.StringVar()
         self.gpa_var = tk.DoubleVar()
         self.sort_by_var = tk.StringVar()
+        self.find_by_var = tk.StringVar()
         #, padx=6, pady=6
         # Create labels and entry widgets
         self.id_label = ttk.Label(self, text="MSSV:").grid(row=2, column=0, padx=6, pady=6)
@@ -33,13 +34,15 @@ class View(ttk.Frame):
         self.gpa_label = ttk.Label(self, text="GPA:").grid(row=2, column=4, padx=6, pady=6)
         self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
 
-        self.sort_by_choices = ttk.Combobox(self, textvariable=self.sort_by_var, values=["Gpa", "Họ", "Tên"]).grid(row=3, column=5, padx=6, pady=6)
+        self.sort_by_choices = ttk.Combobox(self, textvariable=self.sort_by_var, values=["Gpa", "Họ", "Tên"]).grid(row=4, column=4, padx=6, pady=6)
+        self.find_by_choices = ttk.Combobox(self, textvariable=self.find_by_var, values=["Major", "MSSV"]).grid(row=4, column=5, padx=6, pady=6)
 
         # self.show_button = ttk.Button(self, text="DSSV", command=self.).grid(row=3, column=0)
         self.add_button = ttk.Button(self, text="Thêm Sinh viên", command=self.add_student).grid(row=3, column=1, padx=6, pady=6)
         self.update_button = ttk.Button(self, text="Cập nhật Sinh viên", command=self.update_student).grid(row=3, column=2, padx=6, pady=6)
         self.delete_button = ttk.Button(self, text="Xoá Sinh viên", command=self.delete_student).grid(row=3, column=3, padx=6, pady=6)
         self.sort_button = ttk.Button(self, text="Sắp xếp", command=self.sort_students).grid(row=3, column=4, padx=6, pady=6)
+        self.find_button = ttk.Button(self, text="Tìm Sinh viên", command=self.find_student).grid(row=3, column=5, padx=6, pady=6)
 
         #  # Configure grid for responsiveness
         # for i in range(6):  # Adjust depending on your grid size
@@ -55,12 +58,15 @@ class View(ttk.Frame):
         self.student_tree.heading("Tên", text="Tên")
         self.student_tree.heading("Môn học", text="Môn học")
         self.student_tree.heading("GPA", text="GPA")
-        self.student_tree.grid(row=4, column=0, columnspan=6, padx=6, pady=6)
+        self.student_tree.grid(row=5, column=0, columnspan=6, padx=6, pady=6)
     
     def display_students(self, students_list=None):
         self.student_tree.delete(*self.student_tree.get_children())
-        for data_dict in students_list:
-            self.student_tree.insert("", "end", values=tuple(data_dict.values()))
+        if type(students_list) == dict:
+            self.student_tree.insert("", "end", values=tuple(students_list.values()))
+        else:
+            for data_dict in students_list:
+                self.student_tree.insert("", "end", values=tuple(data_dict.values()))
 
     def display_student_already_stored_error(self):
         messagebox.showerror("Sinh viên đã tồn tại")
@@ -94,14 +100,23 @@ class View(ttk.Frame):
         self.clear_entries()
     
     def delete_student(self):
-        student_id, first_name, middle_name, last_name, major, gpa = self.get_value()
+        student_id, _, _, _, _, _ = self.get_value()
         if self.controller:
             self.controller.delete_student(student_id)
         # Clear entry widgets
         self.clear_entries()
     
     def find_student(self):
-        pass
+        find_by = self.find_by_var.get()
+        if self.controller:
+            if find_by == 'Major':
+                _, _, _, _, major, _ = self.get_value()
+                self.controller.find_student(find_by, major)
+            else:
+                student_id, _, _, _, _, _ = self.get_value()
+                self.controller.find_student(find_by, student_id)
+        # Clear entry widgets
+        self.clear_entries()
 
     def sort_students(self):
         sort_by = self.sort_by_var.get()
