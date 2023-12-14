@@ -1,8 +1,6 @@
 import tkinter as tk
 from view.view import View
 from controller.controller import Controller
-from model.student import Student
-import model.sqlite_backend as sqlite_backend
 
 class App(tk.Tk):
     def __init__(self):
@@ -10,10 +8,10 @@ class App(tk.Tk):
         self.geometry("1280x450")
         self.title('Quan ly sinh vien')
 
-        model = Student()
+        # model = Student()
         view = View(self)
         view.grid(row=0, column=0, padx=6, pady=6)
-        controller = Controller(model, view)
+        controller = Controller(view)
         # set the controller to view
         view.set_controller(controller)
 
