@@ -7,14 +7,10 @@ class App(tk.Tk):
         super().__init__()
         self.geometry("1280x450")
         self.title('Quan ly sinh vien')
-
-        # model = Student()
         view = View(self)
         view.grid(row=0, column=0, padx=6, pady=6)
         controller = Controller(view)
-        # set the controller to view
         view.set_controller(controller)
-
 
 if __name__ == '__main__':
     app = App()
