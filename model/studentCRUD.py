@@ -68,20 +68,21 @@ def connect(func):
 #AUTOINCREMENT
 @connect
 def create_table(conn, table_name):
-    sql = 'CREATE TABLE {} (student_id INTEGER PRIMARY KEY, lastName VARCHAR, middleName VARCHAR, firstName VARCHAR, major VARCHAR, gpa REAL)'.format(table_name)
+    sql = 'CREATE TABLE {} (student_id INTEGER PRIMARY KEY, lastName TEXT, middleName TEXT, firstName TEXT, major VARCHAR, gpa REAL)'.format(table_name)
     try:
         conn.execute(sql)
     except OperationalError as e:
         print(e)
 
 @connect
-def insert_one(conn, id, lastName, middleName, firstName, major, gpa, table_name):
-    sql = "INSERT INTO {} ('student_id', 'lastName', 'middleName', 'firstName', 'major', 'gpa') VALUES (?, ?, ?, ?, ?, ?)".format(table_name)
+def insert_one(conn, id, lastName, middleName, firstName, major, table_name):
+    sql = "INSERT INTO {} ('student_id', 'lastName', 'middleName', 'firstName', 'major') VALUES (?, ?, ?, ?, ?)".format(table_name)
     try:
-        conn.execute(sql, (id, lastName, middleName, firstName, major, gpa))
+        conn.execute(sql, (id, lastName, middleName, firstName, major))
         conn.commit()
-    except IntegrityError as e:
-        raise mvc_exc.ItemAlreadyStored('{}: "{}" already stored in table "{}"'.format(e, id, table_name))
+    except IntegrityError:
+        raise mvc_exc.ItemAlreadyStored()
+# '"{}" already stored in table "{}"'.format(id, table_name)
 
 def tuple_to_object(mytuple):
     student = Student(mytuple[0], mytuple[1], mytuple[2], mytuple[3], mytuple[4], mytuple[5])
@@ -95,16 +96,16 @@ def select_all(conn, table_name):
     return list(map(lambda x: tuple_to_object(x), results))
 
 @connect
-def update_one(conn, id, lastName, middleName, firstName, major, gpa, table_name):
+def update_one(conn, id, lastName, middleName, firstName, major, table_name):
     sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE student_id=? LIMIT 1)'.format(table_name)
-    sql_update = 'UPDATE {} SET lastName=?, middleName=?, firstName=?, major=?, gpa=? WHERE student_id=?'.format(table_name)
+    sql_update = 'UPDATE {} SET lastName=?, middleName=?, firstName=?, major=? WHERE student_id=?'.format(table_name)
     c = conn.execute(sql_check, (id,))
     result = c.fetchone()
     if result[0]:
-        c.execute(sql_update, (lastName, middleName, firstName, major, gpa, id))
+        c.execute(sql_update, (lastName, middleName, firstName, major, id))
         conn.commit()
     else:
-        raise mvc_exc.ItemNotStored('Can\'t update "{}" because it\'s not stored in table "{}"'.format(id, table_name))
+        raise mvc_exc.ItemNotStored()
 
 @connect
 def delete_one(conn, id, table_name):
@@ -116,4 +117,4 @@ def delete_one(conn, id, table_name):
         c.execute(sql_delete, (id,))
         conn.commit()
     else:
-        raise mvc_exc.ItemNotStored('Can\'t delete "{}" because it\'s not stored in table "{}"'.format(id, table_name))
+        raise mvc_exc.ItemNotStored()

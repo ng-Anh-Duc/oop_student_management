@@ -1,7 +1,6 @@
 import sqlite3
 from sqlite3 import OperationalError, IntegrityError, ProgrammingError
 import model.mvc_exceptions as mvc_exc
-from model.course import Course
 
 DB_name = 'myDB'
 
@@ -67,7 +66,7 @@ def connect(func):
 #         conn.close()
 #AUTOINCREMENT
 @connect
-def create_table(conn, table_name):
+def create_course_table(conn, table_name):
     sql = 'CREATE TABLE {} (course_id INTEGER PRIMARY KEY, courseName VARCHAR, major VARCHAR)'.format(table_name)
     try:
         conn.execute(sql)
@@ -75,45 +74,53 @@ def create_table(conn, table_name):
         print(e)
 
 @connect
-def insert_one(conn, id, courseName, major, table_name):
-    sql = "INSERT INTO {} ('course_id', 'courseName', 'major') VALUES (?, ?, ?)".format(table_name)
+def create_score_relationship_table(conn, table_name):
+    sql = 'CREATE TABLE {} (student_id INTEGER NOT NULL REFERENCES students(student_id), course_id INTEGER NOT NULL REFERENCES courses(course_id), score REAL, PRIMARY KEY (student_id, course_id))'.format(table_name)
     try:
-        conn.execute(sql, (id, courseName, major))
+        conn.execute(sql)
+    except OperationalError as e:
+        print(e)
+
+@connect
+def insert_one(conn, studentID, courseID, score, table_name):
+    sql = "INSERT INTO {} ('student_id', 'course_id', 'score') VALUES (?, ?, ?)".format(table_name)
+    try:
+        conn.execute(sql, (studentID, courseID, score))
         conn.commit()
-    except IntegrityError as e:
-        raise mvc_exc.ItemAlreadyStored('{}: "{}" already stored in table "{}"'.format(e, id, table_name))
+    except IntegrityError:
+        raise mvc_exc.ItemAlreadyStored()
 
-def tuple_to_object(mytuple):
-    course = Course(mytuple[0], mytuple[1], mytuple[2])
-    return course
+# def tuple_to_object(mytuple):
+#     course = Course(mytuple[0], mytuple[1], mytuple[2])
+#     return course
+
+# @connect
+# def select_all(conn, table_name):
+#     sql = 'SELECT * FROM {}'.format(table_name)
+#     c = conn.execute(sql)
+#     results = c.fetchall()
+#     return list(map(lambda x: tuple_to_object(x), results))
 
 @connect
-def select_all(conn, table_name):
-    sql = 'SELECT * FROM {}'.format(table_name)
-    c = conn.execute(sql)
-    results = c.fetchall()
-    return list(map(lambda x: tuple_to_object(x), results))
-
-@connect
-def update_one(conn, id, courseName, major, table_name):
-    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE course_id=? LIMIT 1)'.format(table_name)
-    sql_update = 'UPDATE {} SET courseName=?, major=? WHERE course_id=?'.format(table_name)
-    c = conn.execute(sql_check, (id,))
+def update_one(conn, studentID, courseID, score, table_name):
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE (student_id, course_id)=(?,?) LIMIT 1)'.format(table_name)
+    sql_update = 'UPDATE {} SET score=? WHERE (student_id, course_id)=(?,?)'.format(table_name)
+    c = conn.execute(sql_check, (studentID, courseID,))
     result = c.fetchone()
     if result[0]:
-        c.execute(sql_update, (courseName, major, id))
+        c.execute(sql_update, (score, studentID, courseID))
         conn.commit()
     else:
-        raise mvc_exc.ItemNotStored('Can\'t update "{}" because it\'s not stored in table "{}"'.format(id, table_name))
+        raise mvc_exc.ItemNotStored()
 
 @connect
-def delete_one(conn, id, table_name):
-    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE course_id=? LIMIT 1)'.format(table_name)
-    sql_delete = 'DELETE FROM {} WHERE course_id=?'.format(table_name)
-    c = conn.execute(sql_check, (id,))
+def delete_one(conn, studentID, courseID, table_name):
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE (student_id, course_id)=(?,?) LIMIT 1)'.format(table_name)
+    sql_delete = 'DELETE FROM {} WHERE (student_id, course_id)=(?,?)'.format(table_name)
+    c = conn.execute(sql_check, (studentID, courseID,))
     result = c.fetchone()
     if result[0]:
-        c.execute(sql_delete, (id,))
+        c.execute(sql_delete, (studentID, courseID,))
         conn.commit()
     else:
-        raise mvc_exc.ItemNotStored('Can\'t delete "{}" because it\'s not stored in table "{}"'.format(id, table_name))
+        raise mvc_exc.ItemNotStored()

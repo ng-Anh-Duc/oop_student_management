@@ -1,6 +1,5 @@
 import tkinter as tk
-from tkinter import ttk
-from tkinter import messagebox
+from tkinter import ttk, messagebox
 
 class MainPage(ttk.Frame):
     def __init__(self, parent):
@@ -11,7 +10,6 @@ class MainPage(ttk.Frame):
         self.middle_name_var = tk.StringVar()
         self.last_name_var = tk.StringVar()
         self.major_var = tk.StringVar()
-        self.gpa_var = tk.DoubleVar()
         self.sort_by_var = tk.StringVar()
         self.find_by_var = tk.StringVar()
         # Create labels and entry widgets
@@ -29,9 +27,6 @@ class MainPage(ttk.Frame):
 
         self.major_label = ttk.Label(self, text="Môn học:").grid(row=2, column=2, padx=6, pady=6)
         self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
-
-        self.gpa_label = ttk.Label(self, text="GPA:").grid(row=2, column=4, padx=6, pady=6)
-        self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
 
         self.sort_by_choices = ttk.Combobox(self, textvariable=self.sort_by_var, values=["Gpa", "Họ", "Tên"]).grid(row=4, column=4, padx=6, pady=6)
         self.find_by_choices = ttk.Combobox(self, textvariable=self.find_by_var, values=["Major", "MSSV"]).grid(row=4, column=5, padx=6, pady=6)
@@ -61,12 +56,18 @@ class MainPage(ttk.Frame):
         for student in students_list:
             values = (student.id, student.lastName, student.middleName, student.firstName, student.major, student.gpa)
             self.student_tree.insert("", "end", values=values)
+    
+    def display_type_warning(self):
+        messagebox.showerror("Ho, ten dem, ten co kieu du lieu la chu")
 
     def display_student_already_stored_error(self):
         messagebox.showerror("Sinh viên đã tồn tại")
 
     def display_student_not_yet_stored_error(self):
         messagebox.showerror("Sinh viên chưa tồn tại")
+    
+    def display_sort_error(self):
+        messagebox.showerror("none type object can't be sorted")
 
     def get_value(self):
         # Get values from entry widgets
@@ -75,20 +76,19 @@ class MainPage(ttk.Frame):
         middle_name = self.middle_name_var.get()
         last_name = self.last_name_var.get()
         major = self.major_var.get()
-        gpa = self.gpa_var.get()
-        return student_id, first_name, middle_name, last_name, major, gpa
+        return student_id, first_name, middle_name, last_name, major
     
     def add_student(self):
-        student_id, first_name, middle_name, last_name, major, gpa = self.get_value()
+        student_id, first_name, middle_name, last_name, major = self.get_value()
         if self.controller:
-            self.controller.insert_student(student_id, last_name, middle_name, first_name, major, gpa)
+            self.controller.insert_student(student_id, last_name, middle_name, first_name, major)
         self.clear_entries()
     
     def update_student(self):
-        student_id, first_name, middle_name, last_name, major, gpa = self.get_value()
+        student_id, first_name, middle_name, last_name, major = self.get_value()
 
         if self.controller:
-            self.controller.update_student(student_id, last_name, middle_name, first_name, major, gpa)
+            self.controller.update_student(student_id, last_name, middle_name, first_name, major)
         self.clear_entries()
     
     def delete_student(self):

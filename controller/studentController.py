@@ -13,27 +13,29 @@ class StudentController():
     def get_all_students(self):
         self.students_db_show = studentCRUD.select_all(self.connection, table_name=self.students)
         return self.students_db_show
-
-    def insert_student(self, id, lastName, middleName, firstName, major, gpa):
-        # assert type(lastName) == str, 'ho must be a string'
-        # assert type(middleName) == str, 'tenDem must be a string'
-        # assert type(firstName) == str, 'ten must be a string'
-        # assert type(major) == str, 'monHoc must be a string'
+    
+    def check_false_type(self, string):
+        for char in string:
+            if not char.isalpha():
+                return True
+        return False
+        
+    def insert_student(self, id, lastName, middleName, firstName, major):
+        if self.check_false_type(lastName) or self.check_false_type(middleName) or self.check_false_type(firstName):
+            self.view.display_type_warning()
         try:
-            studentCRUD.insert_one(self.connection, id, lastName, middleName, firstName, major, gpa, table_name=self.students)
+            studentCRUD.insert_one(self.connection, id, lastName, middleName, firstName, major, table_name=self.students)
             self.students_db_show = studentCRUD.select_all(self.connection, table_name=self.students)
             self.view.display_students(students_list=self.students_db_show)
-        except:
+        except mvc_exc.ItemAlreadyStored:
             self.students_db_show = studentCRUD.select_all(self.connection, table_name=self.students)
             self.view.display_student_already_stored_error()
 
-    def update_student(self, id, lastName, middleName, firstName, major, gpa):
-        # assert type(lastName) == str, 'ho must be a string'
-        # assert type(middleName) == str, 'tenDem must be a string'
-        # assert type(firstName) == str, 'ten must be a string'
-        # assert type(major) == str, 'monHoc must be a string'
+    def update_student(self, id, lastName, middleName, firstName, major):
+        if self.check_false_type(lastName) or self.check_false_type(middleName) or self.check_false_type(firstName):
+            self.view.display_type_warning()
         try:
-            studentCRUD.update_one(self.connection, id, lastName, middleName, firstName, major, gpa, table_name=self.students)
+            studentCRUD.update_one(self.connection, id, lastName, middleName, firstName, major, table_name=self.students)
             self.students_db_show = studentCRUD.select_all(self.connection, table_name=self.students)
             self.view.display_students(students_list=self.students_db_show)
         except:
@@ -52,7 +54,13 @@ class StudentController():
     def sort_students(self, sort_by):
         students = studentCRUD.select_all(self.connection, table_name=self.students)
         if sort_by == 'Gpa':
-            sorted_students = sorted(students, key=lambda student: student.gpa)
+            for student in students:
+                if student.gpa == None:
+                    self.view.display_sort_error()
+                    sorted_students = students
+                    break
+            else:
+                sorted_students = sorted(students, key=lambda student: student.gpa)
         elif sort_by == 'Họ':
             sorted_students = sorted(students, key=lambda student: student.lastName)
         elif sort_by == 'Tên':
