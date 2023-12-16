@@ -58,8 +58,9 @@ class MainPage(ttk.Frame):
         if self.controller and show_button == True:
             students_list = self.controller.get_all_students()
         self.student_tree.delete(*self.student_tree.get_children())
-        for data_dict in students_list:
-            self.student_tree.insert("", "end", values=tuple(data_dict.values()))
+        for student in students_list:
+            values = (student.id, student.lastName, student.middleName, student.firstName, student.major, student.gpa)
+            self.student_tree.insert("", "end", values=values)
 
     def display_student_already_stored_error(self):
         messagebox.showerror("Sinh viên đã tồn tại")

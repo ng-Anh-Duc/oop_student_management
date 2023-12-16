@@ -52,11 +52,11 @@ class StudentController():
     def sort_students(self, sort_by):
         students = studentCRUD.select_all(self.connection, table_name=self.students)
         if sort_by == 'Gpa':
-            sorted_students = sorted(students, key=lambda student: student['gpa'])
+            sorted_students = sorted(students, key=lambda student: student.gpa)
         elif sort_by == 'Họ':
-            sorted_students = sorted(students, key=lambda student: student['lastName'])
+            sorted_students = sorted(students, key=lambda student: student.lastName)
         elif sort_by == 'Tên':
-            sorted_students = sorted(students, key=lambda student: student['firstName'])
+            sorted_students = sorted(students, key=lambda student: student.firstName)
         self.view.display_students(students_list=sorted_students)
     
     def find_student(self, find_by, value):
@@ -64,11 +64,11 @@ class StudentController():
         found_student = []
         if find_by == 'Major':
             for s in students:
-                if s['major'] == value:
+                if s.major == value:
                     found_student.append(s)
         elif find_by == 'MSSV':
             for s in students:
-                if s['id'] == value:
+                if s.id == value:
                     found_student.append(s)
                     break
         self.view.display_students(students_list=found_student)

@@ -1,7 +1,6 @@
 import sqlite3
 from sqlite3 import OperationalError, IntegrityError, ProgrammingError
 import model.mvc_exceptions as mvc_exc
-from model.student import Student
 
 DB_name = 'myDB'
 
@@ -68,31 +67,35 @@ def connect(func):
 #AUTOINCREMENT
 @connect
 def create_table(conn, table_name):
-    sql = 'CREATE TABLE {} (student_id INTEGER PRIMARY KEY, lastName VARCHAR, middleName VARCHAR, firstName VARCHAR, major VARCHAR, gpa REAL)'.format(table_name)
+    sql = 'CREATE TABLE {} (course_id INTEGER PRIMARY KEY, courseName VARCHAR, major VARCHAR)'.format(table_name)
     try:
         conn.execute(sql)
     except OperationalError as e:
         print(e)
 
 @connect
-def insert_one(conn, id, lastName, middleName, firstName, major, gpa, table_name):
-    sql = "INSERT INTO {} ('student_id', 'lastName', 'middleName', 'firstName', 'major', 'gpa') VALUES (?, ?, ?, ?, ?, ?)".format(table_name)
+def insert_one(conn, id, courseName, major, table_name):
+    sql = "INSERT INTO {} ('course_id', 'courseName', 'major') VALUES (?, ?, ?)".format(table_name)
     try:
-        conn.execute(sql, (id, lastName, middleName, firstName, major, gpa))
+        conn.execute(sql, (id, courseName, major))
         conn.commit()
     except IntegrityError as e:
         raise mvc_exc.ItemAlreadyStored('{}: "{}" already stored in table "{}"'.format(e, id, table_name))
 
-def tuple_to_object(mytuple):
-    student = Student(mytuple[0], mytuple[1], mytuple[2], mytuple[3], mytuple[4], mytuple[5])
-    return student
+def tuple_to_dict(mytuple):
+    mydict = dict()
+    mydict['id'] = mytuple[0]
+    mydict['courseName'] = mytuple[1]
+    mydict['major'] = mytuple[2]
+    return mydict
 
 @connect
 def select_all(conn, table_name):
     sql = 'SELECT * FROM {}'.format(table_name)
     c = conn.execute(sql)
     results = c.fetchall()
-    return list(map(lambda x: tuple_to_object(x), results))
+    # return list(map(lambda x: tuple_to_dict(x), results))
+    return list(results)
 
 @connect
 def update_one(conn, id, lastName, middleName, firstName, major, gpa, table_name):
