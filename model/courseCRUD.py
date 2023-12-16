@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import OperationalError, IntegrityError, ProgrammingError
 import model.mvc_exceptions as mvc_exc
+from model.course import Course
 
 DB_name = 'myDB'
 
@@ -82,37 +83,33 @@ def insert_one(conn, id, courseName, major, table_name):
     except IntegrityError as e:
         raise mvc_exc.ItemAlreadyStored('{}: "{}" already stored in table "{}"'.format(e, id, table_name))
 
-def tuple_to_dict(mytuple):
-    mydict = dict()
-    mydict['id'] = mytuple[0]
-    mydict['courseName'] = mytuple[1]
-    mydict['major'] = mytuple[2]
-    return mydict
+def tuple_to_object(mytuple):
+    course = Course(mytuple[0], mytuple[1], mytuple[2])
+    return course
 
 @connect
 def select_all(conn, table_name):
     sql = 'SELECT * FROM {}'.format(table_name)
     c = conn.execute(sql)
     results = c.fetchall()
-    # return list(map(lambda x: tuple_to_dict(x), results))
-    return list(results)
+    return list(map(lambda x: tuple_to_object(x), results))
 
 @connect
-def update_one(conn, id, lastName, middleName, firstName, major, gpa, table_name):
-    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE student_id=? LIMIT 1)'.format(table_name)
-    sql_update = 'UPDATE {} SET lastName=?, middleName=?, firstName=?, major=?, gpa=? WHERE student_id=?'.format(table_name)
+def update_one(conn, id, courseName, major, table_name):
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE course_id=? LIMIT 1)'.format(table_name)
+    sql_update = 'UPDATE {} SET courseName=?, major=? WHERE course_id=?'.format(table_name)
     c = conn.execute(sql_check, (id,))
     result = c.fetchone()
     if result[0]:
-        c.execute(sql_update, (lastName, middleName, firstName, major, gpa, id))
+        c.execute(sql_update, (courseName, major, id))
         conn.commit()
     else:
         raise mvc_exc.ItemNotStored('Can\'t update "{}" because it\'s not stored in table "{}"'.format(id, table_name))
 
 @connect
 def delete_one(conn, id, table_name):
-    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE student_id=? LIMIT 1)'.format(table_name)
-    sql_delete = 'DELETE FROM {} WHERE student_id=?'.format(table_name)
+    sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE course_id=? LIMIT 1)'.format(table_name)
+    sql_delete = 'DELETE FROM {} WHERE course_id=?'.format(table_name)
     c = conn.execute(sql_check, (id,))
     result = c.fetchone()
     if result[0]:
