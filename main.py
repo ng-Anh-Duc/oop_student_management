@@ -1,15 +1,15 @@
 import tkinter as tk
-from view.view import View
-from controller.controller import Controller
+from view.mainPage import MainPage
+from controller.studentController import StudentController
 
 class App(tk.Tk):
     def __init__(self):
         super().__init__()
         self.geometry("1280x450")
         self.title('Quan ly sinh vien')
-        view = View(self)
+        view = MainPage(self)
         view.grid(row=0, column=0, padx=6, pady=6)
-        controller = Controller(view)
+        controller = StudentController(view)
         view.set_controller(controller)
 
 if __name__ == '__main__':

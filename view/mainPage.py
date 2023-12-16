@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-class View(ttk.Frame):
+class MainPage(ttk.Frame):
     def __init__(self, parent):
         super().__init__(parent)
         self.controller = None
@@ -42,6 +42,7 @@ class View(ttk.Frame):
         self.delete_button = ttk.Button(self, text="Xoá Sinh viên", command=self.delete_student).grid(row=3, column=3, padx=6, pady=6)
         self.sort_button = ttk.Button(self, text="Sắp xếp", command=self.sort_students).grid(row=3, column=4, padx=6, pady=6)
         self.find_button = ttk.Button(self, text="Tìm Sinh viên", command=self.find_student).grid(row=3, column=5, padx=6, pady=6)
+        # self.point_button = ttk.Button(self, text="Thêm điểm", command=self.)
 
         # Create student table
         self.student_tree = ttk.Treeview(self, columns=("MSSV", "Họ", "Tên đệm", "Tên", "Môn học", "GPA"), show="headings")
@@ -57,11 +58,8 @@ class View(ttk.Frame):
         if self.controller and show_button == True:
             students_list = self.controller.get_all_students()
         self.student_tree.delete(*self.student_tree.get_children())
-        if type(students_list) == dict:
-            self.student_tree.insert("", "end", values=tuple(students_list.values()))
-        else:
-            for data_dict in students_list:
-                self.student_tree.insert("", "end", values=tuple(data_dict.values()))
+        for data_dict in students_list:
+            self.student_tree.insert("", "end", values=tuple(data_dict.values()))
 
     def display_student_already_stored_error(self):
         messagebox.showerror("Sinh viên đã tồn tại")
@@ -83,7 +81,6 @@ class View(ttk.Frame):
         student_id, first_name, middle_name, last_name, major, gpa = self.get_value()
         if self.controller:
             self.controller.insert_student(student_id, last_name, middle_name, first_name, major, gpa)
-            self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
     
     def update_student(self):
@@ -91,14 +88,12 @@ class View(ttk.Frame):
 
         if self.controller:
             self.controller.update_student(student_id, last_name, middle_name, first_name, major, gpa)
-            self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
     
     def delete_student(self):
         student_id, _, _, _, _, _ = self.get_value()
         if self.controller:
             self.controller.delete_student(student_id)
-            self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
     
     def find_student(self):
@@ -110,14 +105,12 @@ class View(ttk.Frame):
             else:
                 student_id, _, _, _, _, _ = self.get_value()
                 self.controller.find_student(find_by, student_id)
-        self.display_students(students_list=self.controller.students_to_show)
         self.clear_entries()
 
     def sort_students(self):
         sort_by = self.sort_by_var.get()
         if self.controller:
             self.controller.sort_students(sort_by)
-            self.display_students(students_list=self.controller.students_to_show)
 
     def set_controller(self, controller):
         self.controller = controller

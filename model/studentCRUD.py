@@ -97,7 +97,8 @@ def select_all(conn, table_name):
     sql = 'SELECT * FROM {}'.format(table_name)
     c = conn.execute(sql)
     results = c.fetchall()
-    return list(map(lambda x: tuple_to_dict(x), results))
+    # return list(map(lambda x: tuple_to_dict(x), results))
+    return list(results)
 
 @connect
 def update_one(conn, id, lastName, middleName, firstName, major, gpa, table_name):
