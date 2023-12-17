@@ -1,6 +1,6 @@
 import model.mvc_exceptions as mvc_exc
 import model.scoreCRUD as scoreCRUD
-import view.AIPage as AIPage
+# import view.AIPage as AIPage
 
 class CourseController():
     def __init__(self, student_controller):
@@ -60,6 +60,6 @@ class CourseController():
     #     except:
     #         self.students_db_show = studentCRUD.select_all(self.connection, table_name=self.students)
     #         self.view.display_student_not_yet_stored_error()
-    def display_courses_page(self):
-        view = AIPage()
-        view.display_courses_page()
+    # def display_courses_page(self):
+    #     view = AIPage()
+    #     view.display_courses_page()

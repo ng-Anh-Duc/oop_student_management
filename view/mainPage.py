@@ -1,10 +1,81 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk
+from tkinter import messagebox
 
-class MainPage(ttk.Frame):
-    def __init__(self, parent):
+class AIPage(tk.Frame):
+    def __init__(self, parent, controller):
         super().__init__(parent)
-        self.controller = None
+        self.controller = controller
+        self.student_controller = None
+        self.gpa_var = tk.StringVar()
+        self.major_var = tk.StringVar()
+        # self.show_page("AI")
+        self.student_tree = ttk.Treeview(self, columns=("Môn học", "GPA"), show="headings")
+        self.student_tree.heading("Môn học", text="Môn học")
+        self.student_tree.heading("GPA", text="GPA")
+
+        self.major_label = ttk.Label(self, text="Môn học:").grid(row=1, column=1, padx=6, pady=6)
+        self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
+
+        self.gpa_label = ttk.Label(self, text="GPA:").grid(row=1, column=2, padx=6, pady=6)
+        self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
+
+        self.student_tree.grid(row=3, column=0, columnspan=6, padx=6, pady=6)
+    
+    def set_controller(self, controller):
+        self.student_controller = controller
+
+class ITPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        self.student_controller = None
+        self.gpa_var = tk.StringVar()
+        self.major_var = tk.StringVar()
+        # self.show_page("IT")
+        self.student_tree = ttk.Treeview(self, columns=("Môn học", "GPA"), show="headings")
+        self.student_tree.heading("Môn học", text="Môn học")
+        self.student_tree.heading("GPA", text="GPA")
+
+        self.major_label = ttk.Label(self, text="Môn học:").grid(row=1, column=1, padx=6, pady=6)
+        self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
+
+        self.gpa_label = ttk.Label(self, text="GPA:").grid(row=1, column=2, padx=6, pady=6)
+        self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
+
+        self.student_tree.grid(row=3, column=0, columnspan=6, padx=6, pady=6)
+    
+    def set_controller(self, controller):
+        self.student_controller = controller
+
+class MKPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        self.student_controller = None
+        self.gpa_var = tk.StringVar()
+        self.major_var = tk.StringVar()
+        # self.show_page("MK")
+        self.student_tree = ttk.Treeview(self, columns=("Môn học", "GPA"), show="headings")
+        self.student_tree.heading("Môn học", text="Môn học")
+        self.student_tree.heading("GPA", text="GPA")
+
+        self.major_label = ttk.Label(self, text="Môn học:").grid(row=1, column=1, padx=6, pady=6)
+        self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
+
+        self.gpa_label = ttk.Label(self, text="GPA:").grid(row=1, column=2, padx=6, pady=6)
+        self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
+
+        self.student_tree.grid(row=3, column=0, columnspan=6, padx=6, pady=6)
+
+    def set_controller(self, controller):
+        self.student_controller = controller
+
+class MainPage(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        self.controller = controller
+        self.student_controller = None
         self.student_id_var = tk.IntVar()
         self.first_name_var = tk.StringVar()
         self.middle_name_var = tk.StringVar()
@@ -37,8 +108,9 @@ class MainPage(ttk.Frame):
         self.delete_button = ttk.Button(self, text="Xoá Sinh viên", command=self.delete_student).grid(row=3, column=3, padx=6, pady=6)
         self.sort_button = ttk.Button(self, text="Sắp xếp", command=self.sort_students).grid(row=3, column=4, padx=6, pady=6)
         self.find_button = ttk.Button(self, text="Tìm Sinh viên", command=self.find_student).grid(row=3, column=5, padx=6, pady=6)
-        self.score_button = ttk.Button(self, text="Thêm điểm", command=self.invoke_course_controller)
-        self.score_button.grid(row=6, column=0, columnspan=6, padx=6, pady=6)
+        self.ai_button = ttk.Button(self, text="Ngành AI", command=lambda : controller.show_frame(AIPage)).grid(row=4, column=0, padx=6, pady=6)
+        self.it_button = ttk.Button(self, text="Ngành IT", command=lambda : controller.show_frame(ITPage)).grid(row=4, column=1, padx=6, pady=6)
+        self.mk_button = ttk.Button(self, text="Ngành MK", command=lambda : controller.show_frame(MKPage)).grid(row=4, column=2, padx=6, pady=6)
 
         # Create student table
         self.student_tree = ttk.Treeview(self, columns=("MSSV", "Họ", "Tên đệm", "Tên", "Môn học", "GPA"), show="headings")
@@ -51,8 +123,8 @@ class MainPage(ttk.Frame):
         self.student_tree.grid(row=5, column=0, columnspan=6, padx=6, pady=6)
 
     def display_students(self, students_list=None, show_button=False):
-        if self.controller and show_button == True:
-            students_list = self.controller.get_all_students()
+        if self.student_controller and show_button:
+            students_list = self.student_controller.get_all_students()
         self.student_tree.delete(*self.student_tree.get_children())
         for student in students_list:
             values = (student.id, student.lastName, student.middleName, student.firstName, student.major, student.gpa)
@@ -81,45 +153,41 @@ class MainPage(ttk.Frame):
     
     def add_student(self):
         student_id, first_name, middle_name, last_name, major = self.get_value()
-        if self.controller:
-            self.controller.insert_student(student_id, last_name, middle_name, first_name, major)
+        if self.student_controller:
+            self.student_controller.insert_student(student_id, last_name, middle_name, first_name, major)
         self.clear_entries()
     
     def update_student(self):
         student_id, first_name, middle_name, last_name, major = self.get_value()
 
-        if self.controller:
-            self.controller.update_student(student_id, last_name, middle_name, first_name, major)
+        if self.student_controller:
+            self.student_controller.update_student(student_id, last_name, middle_name, first_name, major)
         self.clear_entries()
     
     def delete_student(self):
-        student_id, _, _, _, _, _ = self.get_value()
-        if self.controller:
-            self.controller.delete_student(student_id)
+        student_id, _, _, _, _ = self.get_value()
+        if self.student_controller:
+            self.student_controller.delete_student(student_id)
         self.clear_entries()
     
     def find_student(self):
         find_by = self.find_by_var.get()
-        if self.controller:
+        if self.student_controller:
             if find_by == 'Major':
                 _, _, _, _, major, _ = self.get_value()
-                self.controller.find_student(find_by, major)
+                self.student_controller.find_student(find_by, major)
             else:
                 student_id, _, _, _, _, _ = self.get_value()
-                self.controller.find_student(find_by, student_id)
+                self.student_controller.find_student(find_by, student_id)
         self.clear_entries()
 
     def sort_students(self):
         sort_by = self.sort_by_var.get()
-        if self.controller:
-            self.controller.sort_students(sort_by)
-    
-    def invoke_course_controller(self):
-        if self.controller:
-            self.controller.invoke_course_controller()
+        if self.student_controller:
+            self.student_controller.sort_students(sort_by)
 
     def set_controller(self, controller):
-        self.controller = controller
+        self.student_controller = controller
 
     def clear_entries(self):
         # Clear entry widgets
@@ -128,4 +196,4 @@ class MainPage(ttk.Frame):
         self.middle_name_var.set("")
         self.last_name_var.set("")
         self.major_var.set("")
-        self.gpa_var.set(0.0)
+        # self.gpa_var.set(0.0)
