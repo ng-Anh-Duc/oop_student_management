@@ -1,10 +1,12 @@
 import model.mvc_exceptions as mvc_exc
 import model.studentCRUD as studentCRUD
+from controller.courseController import CourseController as CourseController
 
 class StudentController():
-    def __init__(self, view):
+    def __init__(self, view, course_controller):
         # self.model = model
         self.view = view
+        self.course_controller = course_controller
         self.students = 'students'
         self.connection = studentCRUD.connect_to_db(studentCRUD.DB_name)
         studentCRUD.create_table(self.connection, self.students)
@@ -80,4 +82,6 @@ class StudentController():
                     found_student.append(s)
                     break
         self.view.display_students(students_list=found_student)
-        
+    
+    def invoke_course_controller(self):
+        self.course_controller.display_courses_page()

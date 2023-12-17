@@ -5,23 +5,6 @@ import model.mvc_exceptions as mvc_exc
 DB_name = 'myDB'
 
 def connect_to_db(db=None):
-    """Connect to a sqlite DB. Create the database if there isn't one yet.
-
-    Open a connection to a SQLite DB (either a DB file or an in-memory DB).
-    When a database is accessed by multiple connections, and one of the
-    processes modifies the database, the SQLite database is locked until that
-    transaction is committed.
-
-    Parameters
-    ----------
-    db : str
-        database name (without .db extension). If None, create an In-Memory DB.
-
-    Returns
-    -------
-    connection : sqlite3.Connection
-        connection object
-    """
     if db is None:
         mydb = ':memory:'
         print('New connection to in-memory SQLite DB...')
@@ -31,29 +14,10 @@ def connect_to_db(db=None):
     connection = sqlite3.connect(mydb)
     return connection
 
-# TODO: use this decorator to wrap commit/rollback in a try/except block ?
-# see https://www.kylev.com/2009/05/22/python-decorators-and-database-idioms/
 def connect(func):
-    """Decorator to (re)open a sqlite database connection when needed.
-
-    A database connection must be open when we want to perform a database query
-    but we are in one of the following situations:
-    1) there is no connection
-    2) the connection is closed
-
-    Parameters
-    ----------
-    func : function
-        function which performs the database query
-
-    Returns
-    -------
-    inner func : function
-    """
     def inner_func(conn, *args, **kwargs):
         try:
-            conn.execute(
-                'SELECT name FROM sqlite_temp_master WHERE type="table";')
+            conn.execute('SELECT name FROM sqlite_temp_master WHERE type="table";')
         except (AttributeError, ProgrammingError):
             conn = connect_to_db(DB_name)
         return func(conn, *args, **kwargs)
@@ -82,6 +46,18 @@ def create_score_relationship_table(conn, table_name):
         print(e)
 
 @connect
+def insert_course(conn, courseID, courseName, major, table_name):
+    # Check if the course exists; if not, insert it
+    check_course_sql = 'SELECT EXISTS(SELECT 1 FROM {} WHERE course_id=? LIMIT 1)'.format(table_name)
+    insert_course_sql = 'INSERT INTO {} (course_id, courseName, major) VALUES (?, ?, ?)'.format(table_name)
+
+    c = conn.execute(check_course_sql, (courseID,))
+    if not c.fetchone()[0]:
+        # Course does not exist, insert it
+        conn.execute(insert_course_sql, (courseID, courseName, major))
+        conn.commit()
+
+@connect
 def insert_one(conn, studentID, courseID, score, table_name):
     sql = "INSERT INTO {} ('student_id', 'course_id', 'score') VALUES (?, ?, ?)".format(table_name)
     try:
@@ -100,6 +76,12 @@ def insert_one(conn, studentID, courseID, score, table_name):
 #     c = conn.execute(sql)
 #     results = c.fetchall()
 #     return list(map(lambda x: tuple_to_object(x), results))
+@connect
+def select_scores_by_student(conn, studentID, table_name):
+    sql = 'SELECT * FROM {} WHERE student_id = ?'.format(table_name)
+    c = conn.execute(sql, (studentID,))
+    results = c.fetchall()
+    return results
 
 @connect
 def update_one(conn, studentID, courseID, score, table_name):

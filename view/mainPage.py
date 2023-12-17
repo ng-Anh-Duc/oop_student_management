@@ -37,7 +37,8 @@ class MainPage(ttk.Frame):
         self.delete_button = ttk.Button(self, text="Xoá Sinh viên", command=self.delete_student).grid(row=3, column=3, padx=6, pady=6)
         self.sort_button = ttk.Button(self, text="Sắp xếp", command=self.sort_students).grid(row=3, column=4, padx=6, pady=6)
         self.find_button = ttk.Button(self, text="Tìm Sinh viên", command=self.find_student).grid(row=3, column=5, padx=6, pady=6)
-        # self.point_button = ttk.Button(self, text="Thêm điểm", command=self.)
+        self.score_button = ttk.Button(self, text="Thêm điểm", command=self.invoke_course_controller)
+        self.score_button.grid(row=6, column=0, columnspan=6, padx=6, pady=6)
 
         # Create student table
         self.student_tree = ttk.Treeview(self, columns=("MSSV", "Họ", "Tên đệm", "Tên", "Môn học", "GPA"), show="headings")
@@ -112,6 +113,10 @@ class MainPage(ttk.Frame):
         sort_by = self.sort_by_var.get()
         if self.controller:
             self.controller.sort_students(sort_by)
+    
+    def invoke_course_controller(self):
+        if self.controller:
+            self.controller.invoke_course_controller()
 
     def set_controller(self, controller):
         self.controller = controller

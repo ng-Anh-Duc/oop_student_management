@@ -1,6 +1,7 @@
 import tkinter as tk
 from view.mainPage import MainPage
 from controller.studentController import StudentController
+from controller.courseController import CourseController
 
 class App(tk.Tk):
     def __init__(self):
@@ -9,7 +10,8 @@ class App(tk.Tk):
         self.title('Quan ly sinh vien')
         view = MainPage(self)
         view.grid(row=0, column=0, padx=6, pady=6)
-        controller = StudentController(view)
+        course = CourseController()
+        controller = StudentController(view, course)
         view.set_controller(controller)
 
 if __name__ == '__main__':
