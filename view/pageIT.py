@@ -55,9 +55,12 @@ class ITPage(tk.Frame):
             student_id = self.student_id_var.get()
             scores_list = self.course_controller.get_scores_by_student(student_id)
         self.score_tree.delete(*self.score_tree.get_children())
-        for score in scores_list:
-            values = (score.studentID, score.courseID, score.course, score.score)
-            self.score_tree.insert("", "end", values=values)
+        if scores_list is not None:
+            for score in scores_list:
+                values = (score.studentID, score.courseID, score.course, score.score)
+                self.score_tree.insert("", "end", values=values)
+        else:
+            print("No scores available for the student.")
 
     def display_student_already_stored_error(self):
         messagebox.showerror("Sinh viên đã tồn tại")
@@ -69,7 +72,7 @@ class ITPage(tk.Frame):
         student_id, java, dataStructure, cloud = self.get_value()
         if self.course_controller:
             scores = (java, dataStructure, cloud)
-            self.course_controller.update_scores(student_id, scores)
+            self.course_controller.update_scores(student_id, scores, major='it')
         self.clear_entries()
 
 

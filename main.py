@@ -36,15 +36,15 @@ class App(tk.Tk):
                 frame.set_controller(student_controller)
                 print("Set student controller:", student_controller)
             elif type(frame) == AIPage:
-                course_controller = CourseController(frame, 'ai')
+                course_controller = CourseController(frame)
                 frame.set_controller(course_controller)
                 print("Set course controller:", course_controller)
             elif type(frame) == ITPage:
-                course_controller = CourseController(frame, 'it')
+                course_controller = CourseController(frame)
                 frame.set_controller(course_controller)
                 print("Set course controller:", course_controller)
             elif type(frame) == MKPage:
-                course_controller = CourseController(frame, 'mk')
+                course_controller = CourseController(frame)
                 frame.set_controller(course_controller)
                 print("Set course controller:", course_controller)
   

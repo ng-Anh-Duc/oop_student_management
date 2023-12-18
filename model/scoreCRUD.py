@@ -71,17 +71,18 @@ def tuple_to_score(mytuple):
     score = Score(mytuple[0], mytuple[1], mytuple[2])
     return score
 
-# @connect
-# def select_all(conn, table_name):
-#     sql = 'SELECT * FROM {}'.format(table_name)
-#     c = conn.execute(sql)
-#     results = c.fetchall()
-#     return list(map(lambda x: tuple_to_object(x), results))
+@connect
+def select_all(conn, table_name):
+    sql = 'SELECT * FROM {}'.format(table_name)
+    c = conn.execute(sql)
+    results = c.fetchall()
+    return list(map(lambda x: tuple_to_score(x), results))
 @connect
 def select_scores_by_student(conn, studentID, table_name):
     sql = 'SELECT * FROM {} WHERE student_id = ?'.format(table_name)
     c = conn.execute(sql, (studentID,))
     results = c.fetchall()
+    print(results)
     return list(map(lambda x: tuple_to_score(x), results))
 
 @connect
