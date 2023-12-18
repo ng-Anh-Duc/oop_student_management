@@ -3,14 +3,14 @@ import model.scoreCRUD as scoreCRUD
 # import view.AIPage as AIPage
 
 class CourseController():
-    def __init__(self, student_controller):
+    def __init__(self, view, major):
         # self.model = model
         self.courses = 'courses'
         self.scores = 'scoresRelationship'
-        self.student_controller = student_controller
+        self.view = view
+        self.major = major
         self.connection = scoreCRUD.connect_to_db(scoreCRUD.DB_name)
         scoreCRUD.create_course_table(self.connection, self.courses)
-        scoreCRUD.create_score_relationship_table(self.connection, self.scores)
         scoreCRUD.insert_course(self.connection, 100, 'PythonOOP', 'AI', table_name=self.courses)
         scoreCRUD.insert_course(self.connection, 101, 'Network', 'AI', table_name=self.courses)
         scoreCRUD.insert_course(self.connection, 102, 'Database', 'AI', table_name=self.courses)
@@ -20,6 +20,7 @@ class CourseController():
         scoreCRUD.insert_course(self.connection, 300, 'Business', 'MK', table_name=self.courses)
         scoreCRUD.insert_course(self.connection, 301, 'Advertisement', 'MK', table_name=self.courses)
         scoreCRUD.insert_course(self.connection, 302, 'Excel', 'MK', table_name=self.courses)
+        scoreCRUD.create_score_relationship_table(self.connection, self.scores, self.courses, 'students')
         self.scores_db_show = None
     
     def get_scores_by_student(self, studentID):
@@ -31,15 +32,25 @@ class CourseController():
             if not char.isalpha():
                 return True
         return False
-        
-    # def insert_scores(self, studentID, courseID):
-    #     try:
-    #         scoreCRUD.insert_one(self.connection, studentID, courseID, score, table_name=self.scores)
-    #         self.scores_db_show = scoreCRUD.select_all(self.connection, table_name=self.students)
-    #         self.view.display_students(students_list=self.students_db_show)
-    #     except mvc_exc.ItemAlreadyStored:
-    #         self.students_db_show = scoreCRUD.select_all(self.connection, table_name=self.students)
-    #         self.view.display_student_already_stored_error()
+    
+    def update_scores(self, studentID, score):
+        try:
+            if self.major == 'ai':
+                scoreCRUD.update_one(self.connection, studentID, 100, score[0], table_name=self.scores)
+                scoreCRUD.update_one(self.connection, studentID, 101, score[1], table_name=self.scores)
+                scoreCRUD.update_one(self.connection, studentID, 102, score[2], table_name=self.scores)
+            elif self.major == 'it':
+                scoreCRUD.update_one(self.connection, studentID, 200, score[0], table_name=self.scores)
+                scoreCRUD.update_one(self.connection, studentID, 201, score[1], table_name=self.scores)
+                scoreCRUD.update_one(self.connection, studentID, 202, score[2], table_name=self.scores)
+            elif self.major == 'mk':
+                scoreCRUD.update_one(self.connection, studentID, 300, score[0], table_name=self.scores)
+                scoreCRUD.update_one(self.connection, studentID, 301, score[1], table_name=self.scores)
+                scoreCRUD.update_one(self.connection, studentID, 302, score[2], table_name=self.scores)
+            self.scores_db_show = scoreCRUD.select_scores_by_student(self.connection, studentID, table_name=self.scores)
+            self.view.display_score(scores_list=self.scores_db_show)
+        except mvc_exc.ItemAlreadyStored:
+            self.view.display_student_not_yet_stored_error()
 
     # def update_student(self, id, lastName, middleName, firstName, major):
     #     if self.check_false_type(lastName) or self.check_false_type(middleName) or self.check_false_type(firstName):

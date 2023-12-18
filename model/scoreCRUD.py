@@ -1,6 +1,7 @@
 import sqlite3
 from sqlite3 import OperationalError, IntegrityError, ProgrammingError
 import model.mvc_exceptions as mvc_exc
+from model.score import Score
 
 DB_name = 'myDB'
 
@@ -38,8 +39,8 @@ def create_course_table(conn, table_name):
         print(e)
 
 @connect
-def create_score_relationship_table(conn, table_name):
-    sql = 'CREATE TABLE {} (student_id INTEGER NOT NULL REFERENCES students(student_id), course_id INTEGER NOT NULL REFERENCES courses(course_id), score REAL, PRIMARY KEY (student_id, course_id))'.format(table_name)
+def create_score_relationship_table(conn, table_name1, table_name2, table_name3):
+    sql = 'CREATE TABLE {} (student_id INTEGER NOT NULL REFERENCES {}(student_id), course_id INTEGER NOT NULL REFERENCES {}(course_id), score REAL, PRIMARY KEY (student_id, course_id))'.format(table_name1, table_name2, table_name3)
     try:
         conn.execute(sql)
     except OperationalError as e:
@@ -57,18 +58,18 @@ def insert_course(conn, courseID, courseName, major, table_name):
         conn.execute(insert_course_sql, (courseID, courseName, major))
         conn.commit()
 
-@connect
-def insert_one(conn, studentID, courseID, score, table_name):
-    sql = "INSERT INTO {} ('student_id', 'course_id', 'score') VALUES (?, ?, ?)".format(table_name)
-    try:
-        conn.execute(sql, (studentID, courseID, score))
-        conn.commit()
-    except IntegrityError:
-        raise mvc_exc.ItemAlreadyStored()
+# @connect
+# def insert_one(conn, studentID, courseID, score, table_name):
+#     sql = "INSERT INTO {} ('student_id', 'course_id', 'score') VALUES (?, ?, ?)".format(table_name)
+#     try:
+#         conn.execute(sql, (studentID, courseID, score))
+#         conn.commit()
+#     except IntegrityError:
+#         raise mvc_exc.ItemAlreadyStored()
 
-# def tuple_to_object(mytuple):
-#     course = Course(mytuple[0], mytuple[1], mytuple[2])
-#     return course
+def tuple_to_score(mytuple):
+    score = Score(mytuple[0], mytuple[1], mytuple[2])
+    return score
 
 # @connect
 # def select_all(conn, table_name):
@@ -81,13 +82,13 @@ def select_scores_by_student(conn, studentID, table_name):
     sql = 'SELECT * FROM {} WHERE student_id = ?'.format(table_name)
     c = conn.execute(sql, (studentID,))
     results = c.fetchall()
-    return results
+    return list(map(lambda x: tuple_to_score(x), results))
 
 @connect
 def update_one(conn, studentID, courseID, score, table_name):
     sql_check = 'SELECT EXISTS(SELECT 1 FROM {} WHERE (student_id, course_id)=(?,?) LIMIT 1)'.format(table_name)
     sql_update = 'UPDATE {} SET score=? WHERE (student_id, course_id)=(?,?)'.format(table_name)
-    c = conn.execute(sql_check, (studentID, courseID,))
+    c = conn.execute(sql_check, (studentID, courseID))
     result = c.fetchone()
     if result[0]:
         c.execute(sql_update, (score, studentID, courseID))

@@ -2,75 +2,6 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 
-class AIPage(tk.Frame):
-    def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.controller = controller
-        self.student_controller = None
-        self.gpa_var = tk.StringVar()
-        self.major_var = tk.StringVar()
-        # self.show_page("AI")
-        self.student_tree = ttk.Treeview(self, columns=("Môn học", "GPA"), show="headings")
-        self.student_tree.heading("Môn học", text="Môn học")
-        self.student_tree.heading("GPA", text="GPA")
-
-        self.major_label = ttk.Label(self, text="Môn học:").grid(row=1, column=1, padx=6, pady=6)
-        self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
-
-        self.gpa_label = ttk.Label(self, text="GPA:").grid(row=1, column=2, padx=6, pady=6)
-        self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
-
-        self.student_tree.grid(row=3, column=0, columnspan=6, padx=6, pady=6)
-    
-    def set_controller(self, controller):
-        self.student_controller = controller
-
-class ITPage(tk.Frame):
-    def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.controller = controller
-        self.student_controller = None
-        self.gpa_var = tk.StringVar()
-        self.major_var = tk.StringVar()
-        # self.show_page("IT")
-        self.student_tree = ttk.Treeview(self, columns=("Môn học", "GPA"), show="headings")
-        self.student_tree.heading("Môn học", text="Môn học")
-        self.student_tree.heading("GPA", text="GPA")
-
-        self.major_label = ttk.Label(self, text="Môn học:").grid(row=1, column=1, padx=6, pady=6)
-        self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
-
-        self.gpa_label = ttk.Label(self, text="GPA:").grid(row=1, column=2, padx=6, pady=6)
-        self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
-
-        self.student_tree.grid(row=3, column=0, columnspan=6, padx=6, pady=6)
-    
-    def set_controller(self, controller):
-        self.student_controller = controller
-
-class MKPage(tk.Frame):
-    def __init__(self, parent, controller):
-        super().__init__(parent)
-        self.controller = controller
-        self.student_controller = None
-        self.gpa_var = tk.StringVar()
-        self.major_var = tk.StringVar()
-        # self.show_page("MK")
-        self.student_tree = ttk.Treeview(self, columns=("Môn học", "GPA"), show="headings")
-        self.student_tree.heading("Môn học", text="Môn học")
-        self.student_tree.heading("GPA", text="GPA")
-
-        self.major_label = ttk.Label(self, text="Môn học:").grid(row=1, column=1, padx=6, pady=6)
-        self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
-
-        self.gpa_label = ttk.Label(self, text="GPA:").grid(row=1, column=2, padx=6, pady=6)
-        self.gpa_entry = ttk.Entry(self, textvariable=self.gpa_var).grid(row=2, column=5, padx=6, pady=6)
-
-        self.student_tree.grid(row=3, column=0, columnspan=6, padx=6, pady=6)
-
-    def set_controller(self, controller):
-        self.student_controller = controller
-
 class MainPage(tk.Frame):
     def __init__(self, parent, controller):
         super().__init__(parent)
@@ -96,7 +27,7 @@ class MainPage(tk.Frame):
         self.first_name_label = ttk.Label(self, text="Tên:").grid(row=1, column=4, padx=6, pady=6)
         self.first_name_entry = ttk.Entry(self, textvariable=self.first_name_var).grid(row=1, column=5, padx=6, pady=6)
 
-        self.major_label = ttk.Label(self, text="Môn học:").grid(row=2, column=2, padx=6, pady=6)
+        self.major_label = ttk.Label(self, text="Ngành học:").grid(row=2, column=2, padx=6, pady=6)
         self.major_entry = ttk.Entry(self, textvariable=self.major_var).grid(row=2, column=3, padx=6, pady=6)
 
         self.sort_by_choices = ttk.Combobox(self, textvariable=self.sort_by_var, values=["Gpa", "Họ", "Tên"]).grid(row=4, column=4, padx=6, pady=6)
@@ -108,11 +39,14 @@ class MainPage(tk.Frame):
         self.delete_button = ttk.Button(self, text="Xoá Sinh viên", command=self.delete_student).grid(row=3, column=3, padx=6, pady=6)
         self.sort_button = ttk.Button(self, text="Sắp xếp", command=self.sort_students).grid(row=3, column=4, padx=6, pady=6)
         self.find_button = ttk.Button(self, text="Tìm Sinh viên", command=self.find_student).grid(row=3, column=5, padx=6, pady=6)
-        self.ai_button = ttk.Button(self, text="Ngành AI", command=lambda : controller.show_frame(AIPage)).grid(row=4, column=0, padx=6, pady=6)
-        self.it_button = ttk.Button(self, text="Ngành IT", command=lambda : controller.show_frame(ITPage)).grid(row=4, column=1, padx=6, pady=6)
-        self.mk_button = ttk.Button(self, text="Ngành MK", command=lambda : controller.show_frame(MKPage)).grid(row=4, column=2, padx=6, pady=6)
+        from view.pageAI import AIPage as ai
+        self.ai_button = ttk.Button(self, text="Ngành AI", command=lambda : controller.show_frame(ai)).grid(row=4, column=0, padx=6, pady=6)
+        from view.pageIT import ITPage as it
+        self.it_button = ttk.Button(self, text="Ngành IT", command=lambda : controller.show_frame(it)).grid(row=4, column=1, padx=6, pady=6)
+        from view.pageMK import MKPage as mk
+        self.mk_button = ttk.Button(self, text="Ngành MK", command=lambda : controller.show_frame(mk)).grid(row=4, column=2, padx=6, pady=6)
 
-        # Create student table
+
         self.student_tree = ttk.Treeview(self, columns=("MSSV", "Họ", "Tên đệm", "Tên", "Môn học", "GPA"), show="headings")
         self.student_tree.heading("MSSV", text="MSSV")
         self.student_tree.heading("Họ", text="Họ")
@@ -143,7 +77,6 @@ class MainPage(tk.Frame):
         messagebox.showerror("none type object can't be sorted")
 
     def get_value(self):
-        # Get values from entry widgets
         student_id = self.student_id_var.get()
         first_name = self.first_name_var.get()
         middle_name = self.middle_name_var.get()
@@ -174,10 +107,10 @@ class MainPage(tk.Frame):
         find_by = self.find_by_var.get()
         if self.student_controller:
             if find_by == 'Major':
-                _, _, _, _, major, _ = self.get_value()
+                _, _, _, _, major = self.get_value()
                 self.student_controller.find_student(find_by, major)
             else:
-                student_id, _, _, _, _, _ = self.get_value()
+                student_id, _, _, _, _ = self.get_value()
                 self.student_controller.find_student(find_by, student_id)
         self.clear_entries()
 
@@ -190,7 +123,6 @@ class MainPage(tk.Frame):
         self.student_controller = controller
 
     def clear_entries(self):
-        # Clear entry widgets
         self.student_id_var.set(0)
         self.first_name_var.set("")
         self.middle_name_var.set("")
